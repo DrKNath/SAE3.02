@@ -27,8 +27,7 @@ class master:
             console_command = str(input("Console Serveur >> "))
             if console_command == '/stop':
                 try:
-                    self.__server.send("Le serveur va s'arrêter.".encode('utf-8'))
-                    self.__server.close()
+                    self.broadcast("Le serveur va s'arrêter.".encode('utf-8'))
                 except:
                     pass
                 finally:
@@ -45,29 +44,35 @@ class master:
                 print(f"Connexion de {address}")
 
                 #Thread Client 
-                self.__thread_client = threading.Thread(target=self.broadcast , args=(client_socket, address))
+                self.__thread_client = threading.Thread(target=self.connected_clients, args=(client_socket, address))
                 self.__thread_client.daemon = True
                 self.__thread_client.start()
         except:
             print("Le serveur a été arrêté.")
+
+    def connected_clients(self, client_socket, address):
+        try:
+            while True:
+                message = client_socket.recv(1024).decode('utf-8')
+                if not message:
+                    break
+                self.broadcast(client_socket, address, message)
+        except:
+            print(f"Le client {address} s'est déconnecté.")
         finally:
             self.__clients.remove(client_socket)
             client_socket.close()
-            print(f"Déconnexion de {address}")
+            print(f"Le client {address} s'est déconnecté.")
+        
 
-
-    def broadcast(self, client_socket, address, message_send=''):
-        while True:
-            message = self.__server.recv(1024).decode()
-            if not message:
-                break
-            for client in self.__clients:
-                if client != client_socket:
-                    try: 
-                        self.__server.send(message.encode('utf-8'))
-                    except:
-                        self.clients.remove(client)
-            print(message)
+    def broadcast(self, client_socket, address, message=''):
+        for client in self.__clients:
+            if client != client_socket:
+                try: 
+                    client.send(message.encode('utf-8'))
+                except:
+                    self.__clients.remove(client)
+        print(message)
         
 
 if __name__ == "__main__":
