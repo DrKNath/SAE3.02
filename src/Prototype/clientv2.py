@@ -1,0 +1,61 @@
+import socket
+import threading
+
+class Client:
+    def __init__(self,name: str , host: str ='', port: int =0):
+        self.__name = name
+        self.__host = host
+        self.__port = port
+
+    def start(self):
+        co_master = self.connection('192.168.1.30',10000)
+        co_master.send(f"CLIENT::{self.__name}::{self.__host}::{self.__port}".encode('utf-8'))
+        co_master.close()
+
+    def send_msg(self):
+        send_socket = self.connection('192.168.1.30',10001)
+        while True:
+            try:
+                message = str(input(">> "))
+                if message == '/quit':
+                    break
+                send_socket.send(message.encode('utf-8'))
+            except:
+                print("Impossible d'envoyer le message. Vous êtes peut-être déconnecté.")
+                break
+    
+    def receive_msg(self):
+        recv_socket = socket.socket()
+        recv_socket.bind(('0.0.0.0',10002))
+        recv_socket.listen(5)
+        while True: 
+            conn,address = recv_socket.accept()
+            try :
+                reply = conn.recv(1024).decode()
+                if not reply:
+                    break
+                print(f"\nMessage reçu: {reply}\n>> ", end='')
+            except:
+                print("Vous avez été déconnecté du serveur.")
+                break
+    
+
+    def connection(self, host: str, port: int):
+        co = socket.socket()
+        co.connect((host, port))
+        return co
+    
+    
+
+
+if __name__ == "__main__":
+    host = '0.0.0.0'
+    port = 10002
+    client = Client(host, port)
+
+    thread_recv = threading.Thread(target=client.receive_msg)
+    thread_recv.daemon = True
+    thread_recv.start()
+    client.send_msg()
+
+

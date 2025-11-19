@@ -50,7 +50,7 @@ class Client:
 
 
 if __name__ == "__main__":
-    host = '192.168.1.12'
+    host = '192.0.0.2'
     port = 10000
     client = Client(host, port)
     client.connect()
