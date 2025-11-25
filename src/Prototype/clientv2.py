@@ -42,22 +42,21 @@ class Client:
                 break
     
     def decompilation_msg_master(self, msg): 
-        pattern =  r'^(CLIENT|ROUTER)\s+(\S+)\s+((?:\d{1,3}\.){3}\d{1,3})\s+(\d+)$'
+        pattern =  r'^(CLIENT|ROUTER)\s+(\S+)\s+((?:\d{1,3}\.){3}\d{1,3})\s+(\d+)(?:\s+(\S+))?$'
         match = re.match(pattern, msg)
         if match:
             if match.group(1) == 'CLIENT':
                 self.__list_client.append({
-                    'type': match.group(1),
                     'name': match.group(2),
                     'ip': match.group(3),
                     'port': int(match.group(4))
                 })
             elif match.group(1) == 'ROUTER':
                 self.__list_route.append({
-                    'type': match.group(1),
                     'name': match.group(2),
                     'ip': match.group(3),
-                    'port': int(match.group(4))
+                    'port': int(match.group(4)),
+                    'public_key': match.group(5)
                 })
 
 
