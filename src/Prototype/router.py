@@ -3,7 +3,7 @@ import threading
 import re
 
 class router:
-    def __init__(self,name: str, host: str = '0.0.0.0', port: int = 0):
+    def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):
         self.__name = name
         self.__host = host
         self.__port = port

@@ -2,15 +2,26 @@ import socket
 import threading
 
 class Client:
-    def __init__(self,name: str , host: str ='', port: int =0):
+    def __init__(self,name: str , host: str ='0.0.0.0', port: int = 0):
         self.__name = name
         self.__host = host
         self.__port = port
+        self.__list_Routers = []
+        self.__list_Clients = []
+
+
 
     def start(self):
-        co_master = self.connection('192.168.1.30',10000)
-        co_master.send(f"CLIENT::{self.__name}::{self.__host}::{self.__port}".encode('utf-8'))
-        co_master.close()
+
+
+
+        #Thread send msg 
+        thread_send = threading.Thread(target=self.send_msg)
+        thread_send.daemon = True
+        thread_send.start()
+
+        self.receive_msg()
+
 
     def send_msg(self):
         send_socket = self.connection('192.168.1.30',10001)
@@ -23,6 +34,8 @@ class Client:
             except:
                 print("Impossible d'envoyer le message. Vous êtes peut-être déconnecté.")
                 break
+    
+
     
     def receive_msg(self):
         recv_socket = socket.socket()
@@ -44,9 +57,12 @@ class Client:
         co = socket.socket()
         co.connect((host, port))
         return co
-    
-    
 
+
+    def connection_master(self):
+        co_master = self.connection('192.168.1.30',10000)
+        co_master.send(f"CLIENT::{self.__name}::{self.__host}::{self.__port}".encode('utf-8'))
+    
 
 if __name__ == "__main__":
     host = '0.0.0.0'
