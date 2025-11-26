@@ -1,18 +1,24 @@
 import socket
 import threading
 import re
+import random
 
 class Client:
     def __init__(self,name: str , host: str ='0.0.0.0', port: int = 0):
         self.__name = name
         self.__host = host
         self.__port = port
-        self.__list_route = []
+        self.__list_router = []
         self.__list_client = []
         self.__route = []
 
 
     def start(self):
+        
+        #Thread connection master
+        thread_master = threading.Thread(target=self.connection_master)
+        thread_master.daemon = True
+        thread_master.start()
 
         #Thread send msg 
         thread_send = threading.Thread(target=self.send_msg)
@@ -41,6 +47,7 @@ class Client:
                 print("Vous avez été déconnecté du master.")
                 break
     
+
     def decompilation_msg_master(self, msg): 
         pattern =  r'^(CLIENT|ROUTER)\s+(\S+)\s+((?:\d{1,3}\.){3}\d{1,3})\s+(\d+)(?:\s+(\S+))?$'
         match = re.match(pattern, msg)
@@ -52,7 +59,7 @@ class Client:
                     'port': int(match.group(4))
                 })
             elif match.group(1) == 'ROUTER':
-                self.__list_route.append({
+                self.__list_router.append({
                     'name': match.group(2),
                     'ip': match.group(3),
                     'port': int(match.group(4)),
@@ -60,21 +67,32 @@ class Client:
                 })
 
 
-    def gen_route(self):
-        pass
+    def gen_route(self, nb_hop: int = 3):
+        nb_hop = min(nb_hop, len(self.__list_router))
+        return random.sample(self.__list_router, nb_hop)
     
+
     def send_msg(self):
-        send_socket = self.connection('192.168.1.30',10001)
+        self.__route = self.gen_route()
+        send_socket = self.connection(self.__route[0]['ip'], self.__route[0]['port'])
         while True:
             try:
                 message = str(input(">> "))
                 if message == '/quit':
                     break
+                message =f"::{message}"
+                route_inverse = self.__route[::-1]
+                for route in range(len(route_inverse)-1):
+                    next_ip = route['ip']
+                    next_port = route['port']
+                    message = f"::{next_ip}::{next_port}{message}"
                 send_socket.send(message.encode('utf-8'))
             except:
                 print("Impossible d'envoyer le message. Vous êtes peut-être déconnecté.")
                 break
+        self.__socket.close()
     
+
     def receive_msg(self):
         recv_socket = socket.socket()
         recv_socket.bind(('0.0.0.0',10002))
@@ -95,10 +113,4 @@ if __name__ == "__main__":
     host = '0.0.0.0'
     port = 10002
     client = Client(host, port)
-
-    thread_recv = threading.Thread(target=client.receive_msg)
-    thread_recv.daemon = True
-    thread_recv.start()
-    client.send_msg()
-
-
+    client.start()

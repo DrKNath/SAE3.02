@@ -7,6 +7,8 @@ class router:
         self.__name = name
         self.__host = host
         self.__port = port
+        self.__public_key = None
+        self.__prv_key = None
         self.__list_connected = []
         self.__router_socket = socket.socket()
         self.__master_address: str = '192.168.1.30'
@@ -19,7 +21,7 @@ class router:
         self.__master_socket = socket.socket()
         self.__master_socket.connect((self.__master_address, self.__master_port))
         self.__master_socket.send(
-            f"ROUTER::{self.__name}::{self.__host}::{self.__port}".encode('utf-8')
+            f"ROUTER::{self.__name}::{self.__host}::{self.__port}::{self.__public_key}".encode('utf-8')
         )
         print(f"Connecté au master sur {self.__master_address}:{self.__master_port}")
 
