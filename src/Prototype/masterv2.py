@@ -69,29 +69,29 @@ class Master:
 
     def rcv_msg(self, client_socket, address):
         try:
-            while True:
-                pattern = r'^(CLIENT|ROUTER)::([^:]+)::([^:]+)::([^:]+)(?:::(.*))?$'
-                message = client_socket.recv(1024).decode('utf-8')
-                if not message:
-                    break
-                match = re.match(pattern, message)
-                if match:
-                    if match.group(1) == 'CLIENT':
-                        self.__list_clients.append({
-                            'name': match.group(2),
-                            'ip': match.group(3),
-                            'port': int(match.group(4))
-                        })
-                    if match.group(1) == 'ROUTER':
-                        self.__list_routers.append({
-                            'name': match.group(2),
-                            'ip': match.group(3),
-                            'port': int(match.group(4)),
-                            'public_key': match.group(5)
-                        })
-                
+            message = client_socket.recv(1024).decode('utf-8')
+            self.decrypt_msg(message)
         except:
             pass
+    
+    def decrypt_msg(self, msg):
+        pattern = r'^(CLIENT|ROUTER)::([^:]+)::([^:]+)::([^:]+)(?:::(.*))?$'
+        match = re.match(pattern, msg)
+        if match:
+            if match.group(1) == 'CLIENT':
+                self.__list_clients.append({
+                    'name': match.group(2),
+                    'ip': match.group(3),
+                    'port': int(match.group(4))
+                })
+
+            if match.group(1) == 'ROUTER':
+                self.__list_routers.append({
+                    'name': match.group(2),
+                    'ip': match.group(3),
+                    'port': int(match.group(4)),
+                    'public_key': match.group(5)
+                })  
     
     def broadcast(self, message, sender_socket):
         for client in self.__clients:
