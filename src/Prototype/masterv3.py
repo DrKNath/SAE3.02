@@ -24,7 +24,8 @@ class Master:
                 thread = threading.Thread(target=self.rcv_msg, args=(conn, add))
                 thread.daemon = True
                 thread.start()
-        except:     
+        except: 
+            print("arret")    
             self.stop()
 
 
@@ -127,19 +128,25 @@ class Master:
 
     def stop(self):
         for client in self.__socket_clients:
-            try: 
+            #try: 
+                client.send("salut c".encode('utf-8'))
                 client.close()
-            except: pass
-            print(f"Le client {client} est déconnecté.")
+
+            #except: pass
+                print(f"Le client {client} est déconnecté.")
         
         for client in self.__socket_routers:
-            try: 
+            #try: 
+                client.send("salut r".encode('utf-8'))
                 client.close()
-            except: pass
-            print(f"Le router {client} est déconnecté.")
+            #except: pass
+                print(f"Le router {client} est déconnecté.")
+        time.sleep(1)
+        self.__server_socket.close()
 
 
 
 if __name__ == "__main__":
-    master_server = Master(port=10001)
+    port = int(input("port >>"))
+    master_server = Master(port=port)
     master_server.start()

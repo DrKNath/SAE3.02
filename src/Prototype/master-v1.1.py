@@ -90,6 +90,6 @@ class Master:
 
 
 if __name__ == "__main__":
-    port = 10000
+    port = 10001
     server = Master(port=port)
     server.start()
