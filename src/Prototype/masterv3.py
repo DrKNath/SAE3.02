@@ -24,11 +24,11 @@ class Master:
                 thread = threading.Thread(target=self.rcv_msg, args=(conn, add))
                 thread.daemon = True
                 thread.start()
-        except: 
-            print("arret")    
-            self.stop()
+        except: pass
+        print("arret")    
+        self.stop()
 
-
+    
     def rcv_msg(self, client_socket, address):
         try:
             while True: 
@@ -96,17 +96,13 @@ class Master:
         msg = self.serialize_lists()
         for client in self.__socket_clients:
             try:
-                print("aa")
                 client.send(msg.encode('utf-8'))
             except:
-                print("a")
                 self.remove_socket(client)
 
     def remove_socket(self, client_socket):
         removed = False
-        print("dd")
         if client_socket in self.__socket_clients:
-            print("ddd")
             index = self.__socket_clients.index(client_socket)
             self.__socket_clients.remove(client_socket)
             del self.__list_clients[index]
@@ -118,7 +114,6 @@ class Master:
             removed = True
         if removed:
             try:
-                print("dddd")
                 client_socket.close()
             except:
                 pass
@@ -128,12 +123,12 @@ class Master:
 
     def stop(self):
         for client in self.__socket_clients:
-            #try: 
+            try: 
                 client.send("salut c".encode('utf-8'))
                 client.close()
 
-            #except: pass
-                print(f"Le client {client} est déconnecté.")
+            except: pass
+            print(f"Le client {client} est déconnecté.")
         
         for client in self.__socket_routers:
             #try: 
