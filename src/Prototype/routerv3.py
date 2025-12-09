@@ -92,8 +92,6 @@ class router:
             print(f"[ERREUR FORMAT] {e}")
         except Exception as e:
             print(f"[ERREUR ROUTAGE] {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
         finally:
             conn.close()
 

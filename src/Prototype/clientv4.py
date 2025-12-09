@@ -166,7 +166,7 @@ class Client:
 
     def handle_incoming(self, cli, addr):
         try:
-            msg = cli.recv(2048).decode()
+            msg = cli.recv(4096).decode()
             print(f"\n[MSG REÇU] {msg}\n>> ", end="")
         except:
             pass
