@@ -49,7 +49,7 @@ class Client:
                 with self.__lock:
                     self.__list_client = clients
                     self.__list_router = routers
-
+                    
         except:
             co_master.close()
             print("Vous avez été déconnecté du master.")

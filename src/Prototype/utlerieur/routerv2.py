@@ -32,8 +32,8 @@ class router:
         return co
     
     def connection_master(self):
-        co_master = self.connection('192.168.1.30',10001)
-        co_master.send(f"ROUTER::{self.__name}::{'192.168.1.30'}::{self.__port}::{self.__public_key}".encode('utf-8'))
+        co_master = self.connection('192.0.0.2',10001)
+        co_master.send(f"ROUTER::{self.__name}::{'192.0.0.2'}::{self.__port}::{self.__public_key}".encode('utf-8'))
         # boucle infinie pour maintenir le socket ouvert
         try:
             while True:
@@ -61,9 +61,7 @@ class router:
             message = conn.recv(1024).decode('utf-8')
             if not message:
                 break
-            print(message)
             next_ip, next_port, rest = self.decrypt_message(message)
-            print(f"{next_ip}:{next_port}")
             if next_ip and next_port:
                 forward_socket = socket.socket()
                 forward_socket.connect((next_ip, next_port))
