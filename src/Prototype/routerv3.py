@@ -64,7 +64,7 @@ class router:
     def routage(self, conn, addr):
         try:
             # IMPORTANT: recevoir EN UNE SEULE FOIS tout le message
-            message = conn.recv(4096).decode('utf-8')  # Augmenter la taille buffer
+            message = conn.recv(8192).decode('utf-8')  # Augmenter la taille buffer
             
             if not message:
                 print(f"[{addr}] Message vide reçu")
@@ -119,7 +119,6 @@ class router:
         except Exception as e:
             print(f"[ERREUR DECRYPT] {type(e).__name__}: {e}")
             raise
-
 
 if __name__ == "__main__":
     name = str(input("name >> "))

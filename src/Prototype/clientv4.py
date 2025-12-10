@@ -20,9 +20,7 @@ class Client:
         self.__desitnation_ip = '192.0.0.2'
         self.__destination_port = 30002
     
-
     def start(self):
-
         #thread Master co
         thread_master = threading.Thread(target=self.connection_master)
         thread_master.daemon = True
@@ -36,8 +34,6 @@ class Client:
         #Thread message
         self.send_msg()
         
-
-
     def connection(self, host: str, port: int):
         co = socket.socket()
         co.connect((host, port))
@@ -61,7 +57,6 @@ class Client:
         except:
             co_master.close()
             print("Vous avez été déconnecté du master.")
-
 
     def parse_lists(self, msg):
         clients_part, routers_part = msg.split("||")
@@ -129,7 +124,6 @@ class Client:
         
         return layer
     
-
     def send_msg(self):
         while True:
             message = input(">> ")
@@ -152,7 +146,6 @@ class Client:
             except:
                 print("[ERREUR] Impossible d’envoyer au premier router.")
 
-
     def receive_msg(self):
         server = socket.socket()
         server.bind((self.__host, self.__port))
@@ -171,7 +164,6 @@ class Client:
         except:
             pass
         cli.close()
-
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from sympy import isprime, mod_inverse
 import math
 
 class crypto: 
-    def __init__(self, bits=16):
+    def __init__(self, bits=8):
         self.bits = bits
         self.public_key, self.private_key = self.gen_key()
     
@@ -17,7 +17,9 @@ class crypto:
         """Exposer uniquement la clé privée en lecture seule"""
         return self.private_key
     
-    def gen_prime(self, bits: int = 16):
+    def gen_prime(self, bits: int = None):
+        if bits is None:
+            bits = self.bits
         while True: 
             n = random.getrandbits(bits)
             if isprime(n):
