@@ -180,6 +180,7 @@ class Client:
             pass
         cli.close()
 
+
 if __name__ == "__main__":
     name = str(input("name >>"))
     port = int(input("port >>"))
