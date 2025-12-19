@@ -1,7 +1,9 @@
 import socket
 import threading
 import random
+import time
 from crypto import crypto
+
 
 class Client:
     def __init__(self,name: str , host: str ='0.0.0.0', port: int = 0):
@@ -41,25 +43,48 @@ class Client:
         co = socket.socket()
         co.connect((host, port))
         return co
-    
-    def connection_master(self):
-        co_master = self.connection(self.__master_host, self.__master_port)
-        co_master.send(f"CLIENT::{self.__name}::{'192.0.0.2'}::{self.__port}".encode('utf-8'))
-        try:    
-            while True:
 
-                data = co_master.recv(1024).decode()
-                clients, routers = self.parse_lists(data)
+    def connection_master_loop(self):
+        while self.__running:
+            try:
+                print(f"[INFO] Tentative de connexion au master {self.__master_host}:{self.__master_port}")
 
-                print(self.__list_router)
+                self.__master_socket = self.connection(
+                    self.__master_host,
+                    self.__master_port
+                )
 
-                with self.__lock:
-                    self.__list_client = clients
-                    self.__list_router = routers
-                    
-        except:
-            co_master.close()
-            print("Vous avez été déconnecté du master.")
+                print("[INFO] Connecté au master")
+
+                self.__master_socket.send(
+                    f"CLIENT::{self.__name}::192.0.0.2::{self.__port}".encode("utf-8")
+                )
+
+                while self.__running:
+                    data = self.__master_socket.recv(1024)
+
+                    if not data:
+                        raise ConnectionError("Connexion perdue")
+
+                    clients, routers = self.parse_lists(data.decode())
+
+                    with self.__lock:
+                        self.__list_client = clients
+                        self.__list_router = routers
+
+            except (ConnectionError, socket.error) as e:
+                print(f"[WARN] Master indisponible : {e}")
+
+            finally:
+                if self.__master_socket:
+                    try:
+                        self.__master_socket.close()
+                    except:
+                        pass
+                    self.__master_socket = None
+
+                print("[INFO] Reconnexion dans 3 secondes...")
+                time.sleep(3)
 
     def parse_lists(self, msg):
         clients_part, routers_part = msg.split("||")
@@ -179,7 +204,6 @@ class Client:
         except:
             pass
         cli.close()
-
 
 if __name__ == "__main__":
     name = str(input("name >>"))
