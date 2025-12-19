@@ -9,6 +9,9 @@ class Client:
         self.__host = host
         self.__port = port
 
+        self.__master_host:str
+        self.__master_port:int
+
         self.__crypto = crypto()
 
         self.__list_router = []
@@ -40,11 +43,11 @@ class Client:
         return co
     
     def connection_master(self):
-        co_master = self.connection('192.0.0.2',10001)
+        co_master = self.connection(self.__master_host, self.__master_port)
         co_master.send(f"CLIENT::{self.__name}::{'192.0.0.2'}::{self.__port}".encode('utf-8'))
         try:    
             while True:
-            
+
                 data = co_master.recv(1024).decode()
                 clients, routers = self.parse_lists(data)
 
@@ -126,9 +129,9 @@ class Client:
     
     def send_msg(self):
         while True:
-            message = input(">> ")
-            if message == "/quit":
-                return
+            message = input(">> ").strip()
+            if message.startswith("/"):
+                self.console_msg(message)
             # Génère une nouvelle route
             self.__route = self.gen_route()
             if not self.__route:
@@ -145,6 +148,18 @@ class Client:
                 sock.close()
             except:
                 print("[ERREUR] Impossible d’envoyer au premier router.")
+
+    def console_msg(self, msg: str):
+        parts = msg.split()
+        match parts:
+            case ["/ip","master", ip]:
+                self.__master_host = ip
+                print(f"[INFO] IP master définie à {ip}")
+            case ["/port","master", port]:
+                self.__master_port = int(port)
+                print(f"[INFO] Port master défini à {port}") 
+            case _:
+                print("[ERREUR] Commande inconnue.")
 
     def receive_msg(self):
         server = socket.socket()
@@ -164,7 +179,6 @@ class Client:
         except:
             pass
         cli.close()
-
 
 if __name__ == "__main__":
     name = str(input("name >>"))

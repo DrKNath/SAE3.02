@@ -7,9 +7,14 @@ class router:
         self.__name = name
         self.__host = host
         self.__port = port
+
+        self.__master_host:str
+        self.__master_port:int
+
         self.__crypto = crypto()
         self.__public_key = self.__crypto.public
         self.__prv_key = self.__crypto.prive
+
         self.__router_socket = socket.socket()
         self.__list_connected = []
 
@@ -34,7 +39,7 @@ class router:
         return co
 
     def connection_master(self):
-        co_master = self.connection('192.0.0.2', 10001)
+        co_master = self.connection(self.__master_host, self.__master_port)
         e, n = self.__public_key
         public_key_str = f"{e}:{n}"
         co_master.send(f"ROUTER::{self.__name}::{'192.0.0.2'}::{self.__port}::{public_key_str}".encode('utf-8'))
@@ -119,7 +124,7 @@ class router:
         except Exception as e:
             print(f"[ERREUR DECRYPT] {type(e).__name__}: {e}")
             raise
-
+            
 if __name__ == "__main__":
     name = str(input("name >> "))
     port = int(input("port >> "))
