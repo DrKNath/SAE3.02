@@ -15,6 +15,8 @@ class UIHandler:
     def handle_command(self, cmd):
         parts = cmd.split()
         match parts:
+            case["/stop"]:
+                self.core.stop()
             case ["/ip", "master", ip]:
                 self.core.master_conn.master_host = ip
                 if self.ui: self.ui.update_master_ip_field(ip)
