@@ -7,6 +7,7 @@ class NetworkHandler:
 
     def start_server(self):
         server = socket.socket()
+        print(self.core.host, self.core.port)
         server.bind((self.core.host, self.core.port))
         server.listen(5)
         print(f"[INFO] Client écoute sur {self.core.host}:{self.core.port}")

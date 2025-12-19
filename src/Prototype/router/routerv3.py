@@ -8,8 +8,8 @@ class router:
         self.__host = host
         self.__port = port
 
-        self.__master_host:str
-        self.__master_port:int
+        self.__master_host:str = '192.0.0.2'
+        self.__master_port:int = 10001
 
         self.__crypto = crypto()
         self.__public_key = self.__crypto.public

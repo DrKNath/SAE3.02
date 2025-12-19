@@ -9,7 +9,7 @@ class UIHandler:
     def send_message(self, message):
         route = self.core.onion_router.gen_route()
         self.core.route = route
-        onion = self.core.onion_router.build_onion(message, route)
+        onion = self.core.onion_router.build_onion(message, route, '192.0.0.2', 30002)
         self.core.network_handler.send_to_first_router(onion)
 
     def handle_command(self, cmd):
