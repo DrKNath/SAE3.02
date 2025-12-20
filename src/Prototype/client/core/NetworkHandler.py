@@ -4,6 +4,7 @@ import threading
 class NetworkHandler:
     def __init__(self, core):
         self.core = core
+        self.server = None
 
     def start_server(self):
         server = socket.socket()
@@ -11,9 +12,22 @@ class NetworkHandler:
         server.bind((self.core.host, self.core.port))
         server.listen(5)
         print(f"[INFO] Client écoute sur {self.core.host}:{self.core.port}")
-        while True:
-            cli, addr = server.accept()
-            threading.Thread(target=self.handle_incoming, args=(cli, addr), daemon=True).start()
+        while self.core.running:
+            try:
+                cli, addr = server.accept()
+                threading.Thread(target=self.handle_incoming, args=(cli, addr), daemon=True).start()
+            except socket.timeout:
+                continue
+            except:
+                break
+        print("[INFO] Serveur réseau arrêté")
+    
+    def stop(self):
+        if self.server:
+            try:
+                self.server.close()
+            except:
+                pass
 
     def handle_incoming(self, cli, addr):
         try:

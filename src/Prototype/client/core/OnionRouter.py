@@ -1,6 +1,6 @@
 import random
 import threading
-from crypto import crypto
+from crypto.crypto import crypto
 
 class OnionRouter:
     def __init__(self, core):

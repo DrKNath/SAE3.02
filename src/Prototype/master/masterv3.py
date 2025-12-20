@@ -124,9 +124,7 @@ class Master:
     def stop(self):
         for client in self.__socket_clients:
             try: 
-                client.send("salut c".encode('utf-8'))
                 client.close()
-
             except: pass
             print(f"Le client {client} est déconnecté.")
         

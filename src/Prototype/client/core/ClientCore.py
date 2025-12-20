@@ -10,6 +10,8 @@ class ClientCore:
         self.name = name
         self.host = host
         self.port = port
+
+        self.running = True
         self.lock = threading.Lock()
 
         self.list_clients = []
@@ -31,3 +33,12 @@ class ClientCore:
         # Serveur réception messages
         threading.Thread(target=self.network_handler.start_server, daemon=True).start()
 
+    def stop(self):
+        print("[INFO] Arrêt du client...")
+        self.running = False
+
+        self.master_conn.stop()
+        self.network_handler.stop()
+
+        print("[INFO] Client arrêté.")
+        exit(0)

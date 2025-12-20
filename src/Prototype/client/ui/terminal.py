@@ -7,8 +7,12 @@ class TerminalUI:
 
     def start(self):
         print("[INFO] Terminal UI démarrée")
-        while True:
-            message = input(">> ").strip()
+        while self.ui_handler.core.running:
+            try:
+                message = input(">> ").strip()
+            except:
+                break
+
             if message.startswith("/"):
                 self.ui_handler.handle_command(message)
             else:

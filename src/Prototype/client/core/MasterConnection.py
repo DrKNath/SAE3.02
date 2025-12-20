@@ -9,6 +9,14 @@ class MasterConnection:
         self.sock = None
         self.running = True
 
+    def stop(self):
+        self.running = False
+        if self.sock:
+            try:
+                self.sock.close()
+            except:
+                pass
+
     def connect_master(self):
         while self.running:
             if not self.master_host or not self.master_port:
@@ -23,12 +31,14 @@ class MasterConnection:
                 
                 while self.running:
                     data = self.sock.recv(1024)
+                    print(data)
                     if not data:
                         raise ConnectionError("Connexion perdue")
-                    clients, routers = self.parse_lists(data.decode())
-                    with self.core.lock:
-                        self.core.list_clients = clients
-                        self.core.list_routers = routers
+                    if data:
+                        clients, routers = self.parse_lists(data.decode())
+                        with self.core.lock:
+                            self.core.list_clients = clients
+                            self.core.list_routers = routers
 
             except (ConnectionError, socket.error) as e:
                 print(f"[WARN] Master indisponible : {e}")

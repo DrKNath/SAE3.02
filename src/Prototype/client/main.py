@@ -1,6 +1,6 @@
-from core.ClientCore import ClientCore
-from core.UIHandler import UIHandler
-from ui.terminal import TerminalUI
+from .core.ClientCore import ClientCore
+from .core.UIHandler import UIHandler
+from .ui.terminal import TerminalUI
 
 if __name__ == "__main__":
     name = input("Name >> ")
