@@ -1,6 +1,6 @@
 import socket
 import threading
-from crypto import crypto
+from crypto.crypto import crypto
 
 class router:
     def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):

@@ -18,6 +18,8 @@ class ClientHandler:
                     "port": int(parts[3])
                 })
 
+                conn.send(self.serialize_lists().encode())
+
             elif ctype == "ROUTER":
                 self.socket_routers.append(conn)
                 self.core.list_routers.append({
@@ -27,9 +29,32 @@ class ClientHandler:
                     "public_key": parts[4]
                 })
 
-        # notifier UI
+        self.broadcast_to_clients()
+
         if hasattr(self.core, "ui_handler"):
             self.core.ui_handler.on_update()
+
+    def serialize_lists(self):
+        clients_str = ";;".join(
+            f"{c['name']}::{c['ip']}::{c['port']}"
+            for c in self.core.list_clients
+        )
+
+        routers_str = ";;".join(
+            f"{r['name']}::{r['ip']}::{r['port']}::{r['public_key']}"
+            for r in self.core.list_routers
+        )
+
+        return f"CLIENTS:{clients_str}||ROUTERS:{routers_str}"
+
+    def broadcast_to_clients(self):
+        msg = self.serialize_lists().encode()
+
+        for client in self.socket_clients[:]:
+            try:
+                client.send(msg)
+            except:
+                self.disconnect(client)
 
     def disconnect(self, conn):
         with self.core.lock:
@@ -42,6 +67,8 @@ class ClientHandler:
                 idx = self.socket_routers.index(conn)
                 self.socket_routers.remove(conn)
                 del self.core.list_routers[idx]
+
+        self.broadcast_to_clients()
 
         if hasattr(self.core, "ui_handler"):
             self.core.ui_handler.on_update()
