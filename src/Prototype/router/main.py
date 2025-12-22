@@ -8,7 +8,7 @@ class router:
         self.__host = host
         self.__port = port
 
-        self.__master_host:str = '192.0.0.2'
+        self.__master_host:str = '192.168.1.209'
         self.__master_port:int = 10001
 
         self.__crypto = crypto()
@@ -42,7 +42,7 @@ class router:
         co_master = self.connection(self.__master_host, self.__master_port)
         e, n = self.__public_key
         public_key_str = f"{e}:{n}"
-        co_master.send(f"ROUTER::{self.__name}::{'192.0.0.2'}::{self.__port}::{public_key_str}".encode('utf-8'))
+        co_master.send(f"ROUTER::{self.__name}::192.168.1.209::{self.__port}::{public_key_str}".encode('utf-8'))
         
         # Boucle infinie pour maintenir le socket ouvert
         try:

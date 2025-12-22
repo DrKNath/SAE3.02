@@ -27,7 +27,7 @@ class MasterConnection:
                 self.sock = socket.socket()
                 self.sock.connect((self.master_host, self.master_port))
                 print("[INFO] Connecté au master")
-                self.sock.send(f"CLIENT::{self.core.name}::192.0.0.2::{self.core.port}".encode())
+                self.sock.send(f"CLIENT::{self.core.name}::{self.core.host}::{self.core.port}".encode())
                 
                 while self.running:
                     data = self.sock.recv(1024)
