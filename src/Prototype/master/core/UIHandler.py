@@ -1,24 +1,33 @@
 class UIHandler:
     def __init__(self, core):
         self.core = core
+        self.ui = None
 
-    # événements core → UI
-    def on_update(self):
-        pass
+    def set_ui(self, ui):
+        self.ui = ui
 
-    # getters UI
-    def get_clients(self):
-        return self.core.list_clients
+    def handle_command(self, cmd):
+        parts = cmd.split()
 
-    def get_routers(self):
-        return self.core.list_routers
+        match parts:
+            case ["/stop"]:
+                self.core.stop()
 
-    def get_status(self):
-        return {
-            "clients": len(self.get_clients()),
-            "routers": len(self.get_routers())
-        }
+            case ["/clients"]:
+                if self.ui:
+                    self.ui.display_clients(self.core.list_clients)
 
-    # actions UI → core
-    def stop(self):
-        self.core.stop()
+            case ["/routers"]:
+                if self.ui:
+                    self.ui.display_routers(self.core.list_routers)
+
+            case _:
+                if self.ui:
+                    self.ui.display_error("Commande inconnue")
+
+    def notify_update(self):
+        if self.ui:
+            self.ui.refresh_status(
+                len(self.core.list_clients),
+                len(self.core.list_routers)
+            )

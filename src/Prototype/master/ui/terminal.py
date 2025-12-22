@@ -1,26 +1,31 @@
 class TerminalUI:
     def __init__(self, ui_handler):
-        self.ui = ui_handler
-        self.running = True
+        self.ui_handler = ui_handler
+        ui_handler.set_ui(self)
 
     def start(self):
-        while self.running:
-            cmd = input("master> ").strip()
+        print("[INFO] Master Terminal UI démarrée")
+        while self.ui_handler.core.running:
+            try:
+                cmd = input("master>> ").strip()
+            except:
+                break
 
-            if cmd == "clients":
-                for c in self.ui.get_clients():
-                    print(c)
+            if cmd.startswith("/"):
+                self.ui_handler.handle_command(cmd)
 
-            elif cmd == "routers":
-                for r in self.ui.get_routers():
-                    print(r)
+    def display_clients(self, clients):
+        print("\n[CLIENTS]")
+        for c in clients:
+            print(c)
 
-            elif cmd == "status":
-                print(self.ui.get_status())
+    def display_routers(self, routers):
+        print("\n[ROUTERS]")
+        for r in routers:
+            print(r)
 
-            elif cmd == "exit":
-                self.ui.stop()
-                self.running = False
+    def refresh_status(self, nb_clients, nb_routers):
+        print(f"\n[STATUS] Clients={nb_clients} Routers={nb_routers}")
 
-            else:
-                print("clients | routers | status | exit")
+    def display_error(self, msg):
+        print(f"[ERREUR] {msg}")

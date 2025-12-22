@@ -31,7 +31,6 @@ class MasterConnection:
                 
                 while self.running:
                     data = self.sock.recv(1024)
-                    print(data)
                     if not data:
                         raise ConnectionError("Connexion perdue")
                     if data:
