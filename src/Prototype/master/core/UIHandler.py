@@ -25,7 +25,7 @@ class UIHandler:
                 if self.ui:
                     self.ui.display_error("Commande inconnue")
 
-    def notify_update(self):
+    def on_update(self):
         if self.ui:
             self.ui.refresh_status(
                 len(self.core.list_clients),
