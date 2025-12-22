@@ -17,6 +17,15 @@ class router:
 
         self.__router_socket = socket.socket()
         self.__list_connected = []
+    
+    def get_Host_name_IP(): 
+        try: 
+            host_name = socket.gethostname() 
+            host_ip = socket.gethostbyname(host_name) 
+            print("Hostname : ",host_name) 
+            print("IP : ",host_ip) 
+        except: 
+            print("Unable to get Hostname and IP") 
 
     def start(self):
         # Thread Master co
