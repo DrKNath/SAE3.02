@@ -24,10 +24,23 @@ class UIHandler:
             case _:
                 if self.ui:
                     self.ui.display_error("Commande inconnue")
-
+    
     def on_update(self):
         if self.ui:
             self.ui.refresh_status(
                 len(self.core.list_clients),
                 len(self.core.list_routers)
             )
+    
+    def stop_master(self):
+        self.core.stop()
+
+    def set_master_port(self, port: int):
+        self.core.port = port
+        # éventuellement redémarrer le socket
+        if self.ui:
+            self.ui.refresh_status(len(self.core.list_clients), len(self.core.list_routers))
+
+    def refresh_ui(self):
+        if self.ui:
+            self.ui.refresh_status(len(self.core.list_clients), len(self.core.list_routers))
