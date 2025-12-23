@@ -22,8 +22,7 @@ class router:
         try: 
             host_name = socket.gethostname() 
             host_ip = socket.gethostbyname(host_name) 
-            print("Hostname : ",host_name) 
-            print("IP : ",host_ip) 
+            return host_ip
         except: 
             print("Unable to get Hostname and IP") 
 
@@ -51,7 +50,7 @@ class router:
         co_master = self.connection(self.__master_host, self.__master_port)
         e, n = self.__public_key
         public_key_str = f"{e}:{n}"
-        co_master.send(f"ROUTER::{self.__name}::192.168.1.209::{self.__port}::{public_key_str}".encode('utf-8'))
+        co_master.send(f"ROUTER::{self.__name}::{self.get_Host_name_IP}::{self.__port}::{public_key_str}".encode('utf-8'))
         
         # Boucle infinie pour maintenir le socket ouvert
         try:

@@ -16,6 +16,13 @@ class MasterConnection:
                 self.sock.close()
             except:
                 pass
+    def get_Host_name_IP(): 
+        try: 
+            host_name = socket.gethostname() 
+            host_ip = socket.gethostbyname(host_name)
+            return host_ip
+        except: 
+            print("Unable to get Hostname and IP") 
 
     def connect_master(self):
         while self.running:
@@ -27,7 +34,7 @@ class MasterConnection:
                 self.sock = socket.socket()
                 self.sock.connect((self.master_host, self.master_port))
                 print("[INFO] Connecté au master")
-                self.sock.send(f"CLIENT::{self.core.name}::{self.core.host}::{self.core.port}".encode())
+                self.sock.send(f"CLIENT::{self.core.name}:{self.get_Host_name_IP}::{self.core.port}".encode())
                 
                 while self.running:
                     data = self.sock.recv(1024)
