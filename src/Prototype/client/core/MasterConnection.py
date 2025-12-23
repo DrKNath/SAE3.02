@@ -16,11 +16,13 @@ class MasterConnection:
                 self.sock.close()
             except:
                 pass
-    def get_Host_name_IP(): 
+    def get_Host_IP(self): 
         try: 
-            host_name = socket.gethostname() 
-            host_ip = socket.gethostbyname(host_name)
-            return host_ip
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))  # Pas de connexion réelle
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
         except: 
             print("Unable to get Hostname and IP") 
 

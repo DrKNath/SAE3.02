@@ -8,7 +8,7 @@ class router:
         self.__host = host
         self.__port = port
 
-        self.__master_host:str = '192.168.1.209'
+        self.__master_host:str = '192.168.1.94'
         self.__master_port:int = 10001
 
         self.__crypto = crypto()
@@ -18,11 +18,13 @@ class router:
         self.__router_socket = socket.socket()
         self.__list_connected = []
     
-    def get_Host_name_IP(): 
+    def get_Host_IP(self): 
         try: 
-            host_name = socket.gethostname() 
-            host_ip = socket.gethostbyname(host_name) 
-            return host_ip
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
         except: 
             print("Unable to get Hostname and IP") 
 
