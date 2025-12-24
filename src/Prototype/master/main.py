@@ -1,26 +1,20 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-
-
 from .core.MasterCore import MasterCore
 from .core.UIHandler import UIHandler
 from .ui.Int_Master import MasterGUI
 
 
 def main():
-    port = int(input("Port >> "))
-    core = MasterCore(port=port)
+    # Initialisation sans port (sera défini par l'UI)
+    core = MasterCore()
     handler = UIHandler(core)
-    core.handler=handler
 
     app = QApplication(sys.argv)
-
-
     gui = MasterGUI(handler)
     gui.show()
 
-
-    core.start()
+    # Le core.start() n'est plus appelé ici, mais par le bouton dans la GUI
     sys.exit(app.exec())
 
 

@@ -1,6 +1,7 @@
 import socket
 import threading
 
+
 class NetworkHandler:
     def __init__(self, core):
         self.core = core
@@ -21,7 +22,7 @@ class NetworkHandler:
             except:
                 break
         print("[INFO] Serveur réseau arrêté")
-    
+
     def stop(self):
         if self.server:
             try:
@@ -33,6 +34,7 @@ class NetworkHandler:
         try:
             msg = cli.recv(4096).decode()
             print(f"\n[MSG REÇU] {msg}\n>> ", end="")
+            return self.core.ui_handler.notify_received_message(msg)
         except:
             pass
         cli.close()

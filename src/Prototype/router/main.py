@@ -32,8 +32,7 @@ class router:
         thread_master = threading.Thread(target=self.connection_master)
         thread_master.daemon = True
         thread_master.start()
-        
-        # Socket serveur pour écouter les clients
+
         self.__router_socket.bind((self.__host, self.__port))
         self.__router_socket.listen(5)
         print(f"[ROUTER {self.__name}] Écoute sur {self.__host}:{self.__port}")
@@ -48,22 +47,21 @@ class router:
         return co
 
     def connection_master(self):
-        co_master = self.connection(self.__master_host, self.__master_port)
-        e, n = self.__public_key
-        public_key_str = f"{e}:{n}"
-        co_master.send(f"ROUTER::{self.__name}::192.168.1.209::{self.__port}::{public_key_str}".encode('utf-8'))
-        
-        # Boucle infinie pour maintenir le socket ouvert
         try:
+            co_master = self.connection(self.__master_host, self.__master_port)
+            e, n = self.__public_key
+            public_key_str = f"{e}:{n}"
+            co_master.send(f"ROUTER::{self.__name}::192.168.1.209::{self.__port}::{public_key_str}".encode('utf-8'))
+
             while True:
-                # Ici tu peux écouter des messages du master si besoin
                 data = co_master.recv(1024)
-                if not data:
-                    break  # master a fermé la connexion
-        except Exception as e:
-            print(f"[ERREUR MASTER] {e}")
+                if not data: break
+                if data.decode('utf-8') == "SHUTDOWN": break
+        except: pass
         finally:
             co_master.close()
+            import sys
+            sys.exit(0)
 
     def new_connection(self):
         while True:
@@ -77,8 +75,7 @@ class router:
 
     def routage(self, conn, addr):
         try:
-            # IMPORTANT: recevoir EN UNE SEULE FOIS tout le message
-            message = conn.recv(8192).decode('utf-8')  # Augmenter la taille buffer
+            message = conn.recv(8192).decode('utf-8')
             
             if not message:
                 print(f"[{addr}] Message vide reçu")

@@ -11,23 +11,26 @@ class ClientHandler:
 
         with self.core.lock:
             if ctype == "CLIENT":
+                name, ip, port = parts[1], parts[2], parts[3]
                 self.socket_clients.append(conn)
-                self.core.list_clients.append({
-                    "name": parts[1],
-                    "ip": parts[2],
-                    "port": int(parts[3])
-                })
+                self.core.list_clients.append({"name": name, "ip": ip, "port": int(port)})
+
+                # ON VÉRIFIE SI LA BDD EST PRÊTE AVANT D'ÉCRIRE
+                if getattr(self.core, 'db_connected', False):
+                    self.core.log_message_to_db("SYSTEM", name, f"Connexion Client: {ip}:{port}")
 
                 conn.send(self.serialize_lists().encode())
 
             elif ctype == "ROUTER":
+                name, ip, port, pubkey = parts[1], parts[2], parts[3], parts[4]
                 self.socket_routers.append(conn)
                 self.core.list_routers.append({
-                    "name": parts[1],
-                    "ip": parts[2],
-                    "port": int(parts[3]),
-                    "public_key": parts[4]
+                    "name": name, "ip": ip, "port": int(port), "public_key": pubkey
                 })
+
+                # ON VÉRIFIE SI LA BDD EST PRÊTE
+                if getattr(self.core, 'db_connected', False):
+                    self.core.log_message_to_db("SYSTEM", name, f"Connexion Routeur: {ip}:{port}")
 
         self.broadcast_to_clients()
 

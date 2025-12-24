@@ -6,28 +6,30 @@ class UIHandler:
     def set_ui(self, ui):
         self.ui = ui
 
-    def handle_command(self, cmd):
-        parts = cmd.split()
+    def request_shutdown(self):
+        self.core.shutdown_network()
 
-        match parts:
-            case ["/stop"]:
-                self.core.stop()
-
-            case ["/clients"]:
-                if self.ui:
-                    self.ui.display_clients(self.core.list_clients)
-
-            case ["/routers"]:
-                if self.ui:
-                    self.ui.display_routers(self.core.list_routers)
-
-            case _:
-                if self.ui:
-                    self.ui.display_error("Commande inconnue")
+    def start_master(self, port_str):
+        """Récupère le port de l'UI et lance le Core"""
+        try:
+            port = int(port_str)
+            self.core.port = port
+            self.core.start()
+            if self.ui:
+                self.ui.display_message(f"Serveur démarré sur le port {port}")
+                self.ui.btn_start.setEnabled(False)
+                self.ui.port_input.setEnabled(False)
+        except ValueError:
+            if self.ui:
+                self.ui.display_message("ERREUR : Port invalide")
 
     def on_update(self):
-        if self.ui:
-            self.ui.refresh_status(
-                len(self.core.list_clients),
-                len(self.core.list_routers)
-            )
+        # On récupère les données du core sans le modifier
+        nb_cl = len(self.core.list_clients)
+        nb_ro = len(self.core.list_routers)
+        db_st = "Connectée" if self.core.db_connected else "Déconnectée"
+
+        # On pousse vers la GUI
+        self.ui.refresh_status(nb_cl, nb_ro)
+        self.ui.update_statistics(nb_cl, nb_ro, db_st)
+        self.ui.refresh_keys()
