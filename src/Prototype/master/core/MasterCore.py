@@ -12,69 +12,75 @@ class MasterCore:
         self.lock = threading.Lock()
         self.list_clients = []
         self.list_routers = []
-        self.db_connected = False
-        self.accept_handler = None # Initialisé au start
-        self.client_handler = ClientHandler(self)
-        self.db_connected = False
+
+        # Récupération des paramètres via la console (IP, User, Password)
+        # Usage : python -m master.main 192.168.1.120 root toto123
         target_db_ip = sys.argv[1] if len(sys.argv) > 1 else '127.0.0.1'
+        db_user = sys.argv[2] if len(sys.argv) > 2 else 'root'
+        db_password = sys.argv[3] if len(sys.argv) > 3 else ''
 
         self.db_config = {
             'host': target_db_ip,
-            'user': 'root',
-            'password': '',
+            'user': db_user,
+            'password': db_password,
             'database': 'oignon_db',
-            'autocommit': True
+            'autocommit': True,
+            'connect_timeout': 5
         }
+
         self.db_connected = False
-        self.init_db()
+        self.client_handler = ClientHandler(self)
+        self.init_db_connection()
 
-    def start(self):
-        """Démarre le serveur sur le port configuré"""
-        if self.port is None:
-            return
-        self.accept_handler = AcceptHandler(self)
-        threading.Thread(target=self.accept_handler.start_server, daemon=True).start()
-        print(f"[MASTER] Serveur lancé sur {self.host}:{self.port}")
-
-    def shutdown_network(self):
-        self.running = False
-        with self.lock:
-            for node in self.list_routers + self.list_clients:
-                try:
-                    if 'socket' in node:
-                        node['socket'].send("SHUTDOWN".encode('utf-8'))
-                        node['socket'].close()
-                except: pass
-
-    def init_db(self):
-        # Création de la base
-        conn = pymysql.connect(host=self.db_config['host'], user=self.db_config['user'],
-                               password=self.db_config['password'])
-        cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_config['database']}")
-        conn.close()
-
-        # Création de la table
-        conn = pymysql.connect(**self.db_config)
-        cursor = conn.cursor()
-        cursor.execute("""
-                       CREATE TABLE IF NOT EXISTS logs (
-                           id INT AUTO_INCREMENT PRIMARY KEY,
-                           sender VARCHAR(255),
-                           receiver VARCHAR(255),
-                           content TEXT,
-                           timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                           )
-                       """)
-        conn.close()
-
-        # OBLIGATOIRE : C'est ce flag qui fait passer le rectangle au VERT
-        self.db_connected = True
+    def init_db_connection(self):
+        """Vérifie la connexion à la BDD MariaDB sans créer de tables [cite: 46, 71]"""
+        try:
+            conn = pymysql.connect(**self.db_config)
+            conn.close()
+            self.db_connected = True
+            print(f"[MASTER] Connecté à la BDD MariaDB sur {self.db_config['host']}")
+        except Exception as e:
+            self.db_connected = False
+            print(f"[DATABASE ERROR] Connexion impossible : {e}")
 
     def log_message_to_db(self, sender, receiver, msg):
+        """Ajoute une entrée dans l'historique des logs [cite: 224]"""
         if self.db_connected:
-            conn = pymysql.connect(**self.db_config)
-            cursor = conn.cursor()
-            sql = "INSERT INTO logs (sender, receiver, content) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (sender, receiver, msg))
-            conn.close()
+            try:
+                conn = pymysql.connect(**self.db_config)
+                cursor = conn.cursor()
+                sql = "INSERT INTO logs (sender, receiver, content) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (sender, receiver, msg))
+                conn.close()
+            except Exception as e:
+                print(f"[DATABASE ERROR] Erreur log : {e}")
+
+    def db_manage_active_node(self, name, ntype, ip, port, pubkey=None):
+        """Met à jour un nœud (Client/Routeur) dans la table active_nodes """
+        if self.db_connected:
+            try:
+                conn = pymysql.connect(**self.db_config)
+                cursor = conn.cursor()
+                # REPLACE met à jour si le nom existe déjà
+                sql = "REPLACE INTO active_nodes (name, type, ip, port, public_key) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(sql, (name, ntype, ip, port, pubkey))
+                conn.close()
+            except Exception as e:
+                print(f"[DATABASE ERROR] Erreur ajout nœud : {e}")
+
+    def db_remove_active_node(self, name):
+        """Supprime un nœud de la BDD lors de sa déconnexion"""
+        if self.db_connected:
+            try:
+                conn = pymysql.connect(**self.db_config)
+                cursor = conn.cursor()
+                sql = "DELETE FROM active_nodes WHERE name = %s"
+                cursor.execute(sql, (name,))
+                conn.close()
+            except Exception as e:
+                print(f"[DATABASE ERROR] Erreur suppression nœud : {e}")
+
+    def start(self):
+        if self.port is None: return
+        self.accept_handler = AcceptHandler(self)
+        threading.Thread(target=self.accept_handler.start_server, daemon=True).start()

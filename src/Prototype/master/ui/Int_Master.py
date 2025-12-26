@@ -189,9 +189,12 @@ class MasterGUI(QMainWindow):
     def update_statistics(self, clients, routers, db_status):
         self.label_messages.setText(f"Total : {clients}")
         self.label_routes.setText(f"Total : {routers}")
+
         self.label_db.setText(db_status)
-        color = "#198754" if db_status == "Connectée" else "#dc3545"
-        self.label_db.setStyleSheet(f"font-size: 24px; color: {color}; font-weight: bold;")
+        if db_status == "Connectée":
+            self.label_db.setStyleSheet("font-size: 24px; color: #198754; font-weight: bold;")
+        else:
+            self.label_db.setStyleSheet("font-size: 24px; color: #dc3545; font-weight: bold;")
 
     def refresh_keys(self):
         self.table_keys.setRowCount(0)
