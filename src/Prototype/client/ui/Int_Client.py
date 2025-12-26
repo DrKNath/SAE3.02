@@ -11,31 +11,53 @@ class ClientGUI(QMainWindow):
 
         self.setWindowTitle("Client - Messagerie Oignon")
         self.resize(1100, 750)
-        self.setStyleSheet("QMainWindow { background-color: #1e1e1e; color: white; } QLabel { color: white; }")
+        # Style identique au Master
+        self.setStyleSheet("""
+            QMainWindow { background-color: #f5f5f5; }
+            QLabel { color: #333333; }
+            QGroupBox { 
+                font-weight: bold; 
+                border: 2px solid #dddddd; 
+                border-radius: 5px; 
+                margin-top: 15px; 
+                padding-top: 20px; 
+                color: #333333; 
+                background-color: #ffffff; 
+            }
+            QGroupBox::title { 
+                subcontrol-origin: margin; 
+                left: 10px; 
+                padding: 0 3px; 
+            }
+        """)
 
         central_widget = QWidget()
         main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
         top_layout = QHBoxLayout()
 
         # --- GAUCHE : MON IDENTITÉ & CONNEXION ---
         left_panel = QVBoxLayout()
         id_box = QGroupBox("Mon Identité (Machine)")
-        id_box.setStyleSheet("color: white; border: 1px solid #555;")
         id_lay = QVBoxLayout()
         self.in_name = QLineEdit("Client_B")
+        self.in_name.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         self.in_port = QLineEdit("20002")
+        self.in_port.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         id_lay.addWidget(QLabel("Nom :")); id_lay.addWidget(self.in_name)
         id_lay.addWidget(QLabel("Port d'écoute :")); id_lay.addWidget(self.in_port)
         id_box.setLayout(id_lay)
         left_panel.addWidget(id_box)
 
         mst_box = QGroupBox("Connexion Master")
-        mst_box.setStyleSheet("color: white; border: 1px solid #555;")
         mst_lay = QVBoxLayout()
         self.in_master_ip = QLineEdit("192.168.1.209")
+        self.in_master_ip.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         self.in_master_port = QLineEdit("10001")
+        self.in_master_port.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         self.btn_launch = QPushButton("🚀 Lancer le Client")
-        self.btn_launch.setStyleSheet("background-color: #0d6efd; color: white; font-weight: bold; padding: 8px;")
+        self.btn_launch.setStyleSheet("background-color: #0d6efd; color: white; font-weight: bold; padding: 8px; border-radius: 4px;")
         self.btn_launch.clicked.connect(self.on_launch)
         mst_lay.addWidget(QLabel("IP Master :")); mst_lay.addWidget(self.in_master_ip)
         mst_lay.addWidget(QLabel("Port Master :")); mst_lay.addWidget(self.in_master_port)
@@ -49,21 +71,21 @@ class ClientGUI(QMainWindow):
         mid_panel.addWidget(QLabel("Messages Reçus :"))
         self.receive_area = QTextEdit()
         self.receive_area.setReadOnly(True)
-        self.receive_area.setStyleSheet("background-color: #2b2b2b; color: #fff; border: 1px solid #444;")
+        self.receive_area.setStyleSheet("background-color: #1e1e1e; color: #ffffff; font-family: 'Consolas'; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         mid_panel.addWidget(self.receive_area, 3)
 
         send_box = QGroupBox("Envoi")
-        send_box.setStyleSheet("color: white; border: 1px solid #555;")
         send_lay = QVBoxLayout()
         self.msg_input = QTextEdit()
         self.msg_input.setMaximumHeight(80)
-        self.msg_input.setStyleSheet("background-color: #2b2b2b; color: white;")
+        self.msg_input.setStyleSheet("background-color: #1e1e1e; color: #ffffff; font-family: 'Consolas'; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         h_lay = QHBoxLayout()
         self.nb_hops = QSpinBox()
+        self.nb_hops.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         self.nb_hops.setRange(1, 10); self.nb_hops.setValue(3)
         h_lay.addWidget(QLabel("Nombre de sauts :")); h_lay.addWidget(self.nb_hops)
         btn_send = QPushButton("✉ ENVOYER")
-        btn_send.setStyleSheet("background-color: #198754; color: white; font-weight: bold; padding: 10px;")
+        btn_send.setStyleSheet("background-color: #198754; color: white; font-weight: bold; padding: 10px; border-radius: 4px;")
         btn_send.clicked.connect(self.on_send)
         send_lay.addWidget(self.msg_input); send_lay.addLayout(h_lay); send_lay.addWidget(btn_send)
         send_box.setLayout(send_lay)
@@ -74,8 +96,8 @@ class ClientGUI(QMainWindow):
         right_panel = QVBoxLayout()
         self.list_c = QListWidget()
         self.list_r = QListWidget()
-        self.list_c.setStyleSheet("background-color: #2b2b2b; color: white; selection-background-color: #0d6efd;")
-        self.list_r.setStyleSheet("background-color: #2b2b2b; color: white;")
+        self.list_c.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
+        self.list_r.setStyleSheet("background-color: #ffffff; color: #333333; border: 1px solid #dddddd; border-radius: 4px; padding: 5px;")
         right_panel.addWidget(QLabel("Clients (Destinataires) :")); right_panel.addWidget(self.list_c)
         right_panel.addWidget(QLabel("Routeurs actifs :")); right_panel.addWidget(self.list_r)
         top_layout.addLayout(right_panel, 1)
@@ -86,7 +108,7 @@ class ClientGUI(QMainWindow):
         main_layout.addWidget(QLabel("Logs du Client :"))
         self.log_console = QTextEdit()
         self.log_console.setReadOnly(True)
-        self.log_console.setStyleSheet("background-color: #111; color: #00ff00; font-family: 'Consolas';")
+        self.log_console.setStyleSheet("background-color: #1e1e1e; color: #ffffff; font-family: 'Consolas';")
         self.log_console.setMaximumHeight(120)
         main_layout.addWidget(self.log_console)
 
