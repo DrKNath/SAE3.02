@@ -8,8 +8,8 @@ class router:
         self.__host = host
         self.__port = port
 
-        self.__master_host:str
-        self.__master_port:int
+        self.__master_host:str = None
+        self.__master_port:int = None
 
         self.__crypto = crypto()
         self.__public_key = self.__crypto.public
@@ -17,6 +17,9 @@ class router:
 
         self.__router_socket = socket.socket()
         self.__list_connected = []
+
+        self.__chunk_buffer = {}
+
     
     def get_Host_IP(self):
         try:
@@ -53,21 +56,32 @@ class router:
         return co
 
     def connection_master(self):
-        try:
-            co_master = self.connection(self.__master_host, self.__master_port)
-            e, n = self.__public_key
-            public_key_str = f"{e}:{n}"
-            co_master.send(f"ROUTER::{self.__name}::{self.get_Host_IP()}::{self.__port}::{public_key_str}".encode('utf-8'))
+        while True:
+            if not self.__master_host or not self.__master_port:
+                import time
+                time.sleep(1)
+                continue
 
-            while True:
-                data = co_master.recv(1024)
-                if not data: break
-                if data.decode('utf-8') == "SHUTDOWN": break
-        except: pass
-        finally:
-            co_master.close()
-            import sys
-            sys.exit(0)
+            co_master = None
+            try:
+                co_master = self.connection(self.__master_host, self.__master_port)
+                e, n = self.__public_key
+                public_key_str = f"{e}:{n}"
+                co_master.send(f"ROUTER::{self.__name}::{self.get_Host_IP()}::{self.__port}::{public_key_str}".encode('utf-8'))
+
+                while True:
+                    data = co_master.recv(1024)
+                    if not data: break
+                    if data.decode('utf-8') == "SHUTDOWN": break
+
+            except Exception as e:
+                print(f"[ERREUR MASTER] {type(e).__name__}: {e}")
+            finally:
+                if co_master:
+                    co_master.close()
+                import time
+                time.sleep(5)  # on attend avant de retenter
+
 
     def new_connection(self):
         while True:
@@ -81,36 +95,68 @@ class router:
 
     def routage(self, conn, addr):
         try:
-            message = conn.recv(8192).decode('utf-8')
-            
-            if not message:
-                print(f"[{addr}] Message vide reçu")
+            full_message = self.receive_full_message(conn)
+            print(full_message)
+
+            if not full_message:
+                print(f"[{addr}] Message vide ou incomplet")
                 return
-            
-            print(f"[REÇU DE {addr}] Taille: {len(message)} caractères")
-            print(f"[REÇU] Début: {message[:100]}...")
-            
-            # Déchiffrer le message
-            next_ip, next_port, rest = self.decrypt_message(message)
-            
-            print(f"[DÉCHIFFRÉ] Next hop: {next_ip}:{next_port}")
-            print(f"[DÉCHIFFRÉ] Contenu à transférer: {len(rest)} caractères")
-            
-            # Transférer au prochain saut
+
+            # Déchiffrer
+            next_ip, next_port, rest = self.decrypt_message(full_message)
+
+            # Forward
             if next_ip and next_port:
                 print(f"[TRANSFERT] Vers {next_ip}:{next_port}")
                 forward_socket = socket.socket()
                 forward_socket.connect((next_ip, next_port))
                 forward_socket.send(rest.encode('utf-8'))
                 forward_socket.close()
-                print(f"[OK] Transféré avec succès")
-                
+                print("[OK] Message transféré")
+
         except ValueError as e:
             print(f"[ERREUR FORMAT] {e}")
         except Exception as e:
             print(f"[ERREUR ROUTAGE] {type(e).__name__}: {e}")
         finally:
             conn.close()
+
+
+    def receive_full_message(self, conn):
+        """
+        Reçoit tous les chunks et reconstruit le message complet
+        """
+        while True:
+            data = conn.recv(2048)
+            print(data)
+            if not data:
+                break
+
+            try:
+                header, payload = data.split(b"|", 3)[0:3], data.split(b"|", 3)[3]
+                msg_id = int(header[0])
+                chunk_index = int(header[1])
+                total_chunks = int(header[2])
+            except:
+                print("[ERREUR] Chunk invalide reçu")
+                return None
+
+            if msg_id not in self.__chunk_buffer:
+                self.__chunk_buffer[msg_id] = {
+                    "total": total_chunks,
+                    "chunks": {}
+                }
+
+            self.__chunk_buffer[msg_id]["chunks"][chunk_index] = payload
+
+            # Si tous les chunks sont reçus
+            if len(self.__chunk_buffer[msg_id]["chunks"]) == total_chunks:
+                chunks = self.__chunk_buffer[msg_id]["chunks"]
+                full_data = b"".join(chunks[i] for i in range(total_chunks))
+                del self.__chunk_buffer[msg_id]
+                return full_data.decode("utf-8")
+
+        return None
 
     def decrypt_message(self, encrypted_message: str):
         print(f"[DECRYPT] Tentative de déchiffrement...")

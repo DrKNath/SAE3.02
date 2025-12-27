@@ -19,6 +19,7 @@ class UIHandler:
         route = self.core.onion_router.gen_route(nb_hops)
         self.core.route = route
         onion = self.core.onion_router.build_onion(self.core.name + ' : ' +  message, route, dest_ip, int(dest_port))
+        onion = onion.encode()
         self.core.network_handler.send_to_first_router(onion)
 
     def start_connection(self, master_ip, master_port, client_name, client_port):

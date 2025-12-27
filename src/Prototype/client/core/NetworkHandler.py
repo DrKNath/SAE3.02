@@ -1,11 +1,14 @@
 import socket
 import threading
 
-
 class NetworkHandler:
     def __init__(self, core):
         self.core = core
         self.server = None
+
+        #Partie chunk
+        self.MAX_CHUNK_SIZE = 1024  #taille max par chunk 
+        self._msg_counter:int = 0      
 
     def start_server(self):
         server = socket.socket()
@@ -39,14 +42,38 @@ class NetworkHandler:
             pass
         cli.close()
 
-    def send_to_first_router(self, onion):
+    def _next_msg_id(self):
+        self._msg_counter += 1
+        return self._msg_counter
+
+    def chunk_message(self, data: bytes):
+        msg_id = self._next_msg_id()
+        chunks = []
+
+        total_chunks = (len(data) + self.MAX_CHUNK_SIZE - 1) // self.MAX_CHUNK_SIZE
+
+        for i in range(total_chunks):
+            start = i * self.MAX_CHUNK_SIZE
+            end = start + self.MAX_CHUNK_SIZE
+            chunk_data = data[start:end]
+
+            header = f"{msg_id}|{i}|{total_chunks}|".encode()
+            chunks.append(header + chunk_data)
+
+        return chunks
+
+    def send_to_first_router(self, onion: bytes):
         if not self.core.route:
             return
         first = self.core.route[0]
+        chunk = self.chunk_message(onion)
+        print(chunk)
         try:
             sock = socket.socket()
             sock.connect((first["ip"], first["port"]))
-            sock.send(onion.encode())
+            for chunks in chunk:
+                print(chunks)
+                sock.send(chunks)
             sock.close()
         except:
             print("[ERREUR] Impossible d’envoyer au premier router.")

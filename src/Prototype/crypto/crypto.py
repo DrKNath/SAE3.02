@@ -1,6 +1,5 @@
 import random
 from sympy import isprime, mod_inverse
-import math
 
 class crypto: 
     def __init__(self, bits=8):
