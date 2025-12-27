@@ -24,7 +24,6 @@ class UIHandler:
                 self.ui.display_message("ERREUR : Port invalide")
 
     def on_update(self):
-        # On récupère les données du core sans le modifier
         nb_cl = len(self.core.list_clients)
         nb_ro = len(self.core.list_routers)
         db_st = "Connectée" if self.core.db_connected else "Déconnectée"
