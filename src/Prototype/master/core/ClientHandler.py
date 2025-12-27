@@ -72,6 +72,12 @@ class ClientHandler:
             except:
                 self.disconnect(client)
 
+        for router in self.socket_routers[:]:
+            try:
+                router.send(b"")  # Test de socket
+            except:
+                self.disconnect(router)
+
     def stop(self):
         for s in self.socket_clients + self.socket_routers:
             try:
