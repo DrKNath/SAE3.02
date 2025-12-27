@@ -5,7 +5,7 @@ from .core.UIHandler import UIHandler
 from .ui.Int_Client import ClientGUI
 
 def main():
-    # Initialisation sans paramètres, ils viendront de l'interface
+
     client_core = ClientCore(name="Temp", port=0)
     ui_handler = UIHandler(client_core)
     client_core.ui_handler = ui_handler
