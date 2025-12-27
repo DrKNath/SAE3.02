@@ -8,8 +8,8 @@ class router:
         self.__host = host
         self.__port = port
 
-        self.__master_host:str = '192.168.1.209'
-        self.__master_port:int = 10001
+        self.__master_host:str
+        self.__master_port:int
 
         self.__crypto = crypto()
         self.__public_key = self.__crypto.public
@@ -29,6 +29,11 @@ class router:
             print("Unable to get Hostname and IP")
 
     def start(self):
+        #Thread Terminal
+        thread_terminal = threading.Thread(target=self.terminal_loop)
+        thread_terminal.daemon = True
+        thread_terminal.start()
+
         # Thread Master co
         thread_master = threading.Thread(target=self.connection_master)
         thread_master.daemon = True
@@ -131,6 +136,70 @@ class router:
         except Exception as e:
             print(f"[ERREUR DECRYPT] {type(e).__name__}: {e}")
             raise
+    
+    def terminal_loop(self):
+        while True:
+            try:
+                cmd = str(input("router> ").strip())
+                if not cmd:
+                    continue
+                if cmd.startswith("/"):
+                    self.console_cmd(cmd)
+                else:
+                    print("[INFO] Le router ne peut pas envoyer de messages.")
+            except KeyboardInterrupt:
+                print("\n[STOP] Arrêt du router.")
+                break
+    
+    def console_cmd(self, cmd: str):
+        parts = cmd.split()
+
+        match parts:
+            case ["/ip", "master", ip]:
+                self.__master_host = ip
+                print(f"[INFO] IP master définie à {ip}")
+
+            case ["/port", "master", port]:
+                self.__master_port = int(port)
+                print(f"[INFO] Port master défini à {port}")
+
+            case ["/status"]:
+                print("---- ROUTER STATUS ----")
+                print(f"Name         : {self.__name}")
+                print(f"Listening    : {self.__host}:{self.__port}")
+                print(f"Master       : {getattr(self, '_router__master_host', None)}:{getattr(self, '_router__master_port', None)}")
+                print(f"Connexions   : {len(self.__list_connected)}")
+
+            case ["/start", "master"]:
+                print("[INFO] Connexion master demandée.")
+                threading.Thread(target=self.connection_master, daemon=True).start()
+
+            case ["/help"]:
+                print("""
+                    Commandes disponibles:
+                    /ip master <ip>       → définir IP du master
+                    /port master <port>   → définir port du master
+                    /start master         → forcer connexion master
+                    /status               → état du router
+                    /stop                 → arrêter le router
+                    """)
+
+            case ["/stop"]:
+                print("[STOP] Fermeture du router.")
+                self.__router_socket.close()
+                import sys
+                sys.exit(0)
+
+            case _:
+                print("""
+                    Commandes disponibles:
+                    /ip master <ip>       → définir IP du master
+                    /port master <port>   → définir port du master
+                    /start master         → forcer connexion master
+                    /status               → état du router
+                    /stop                 → arrêter le router
+                    """)
+        
             
 if __name__ == "__main__":
     name = str(input("name >> "))
