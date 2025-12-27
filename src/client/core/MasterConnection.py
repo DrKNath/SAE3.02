@@ -1,7 +1,6 @@
 import time
 import socket
 
-
 class MasterConnection:
     def __init__(self, core):
         self.core = core
