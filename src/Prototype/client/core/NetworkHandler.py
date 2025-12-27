@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 class NetworkHandler:
     def __init__(self, core):
@@ -36,7 +37,6 @@ class NetworkHandler:
     def handle_incoming(self, cli, addr):
         try:
             msg = cli.recv(4096).decode()
-            print(f"\n[MSG REÇU] {msg}\n>> ", end="")
             return self.core.ui_handler.notify_received_message(msg)
         except:
             pass
@@ -74,6 +74,8 @@ class NetworkHandler:
             for chunks in chunk:
                 print(chunks)
                 sock.send(chunks)
+                time.sleep(3)
+            
             sock.close()
         except:
             print("[ERREUR] Impossible d’envoyer au premier router.")

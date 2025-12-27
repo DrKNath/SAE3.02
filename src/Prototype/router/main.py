@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 from crypto.crypto import crypto
 
 class router:
@@ -96,7 +97,6 @@ class router:
     def routage(self, conn, addr):
         try:
             full_message = self.receive_full_message(conn)
-            print(full_message)
 
             if not full_message:
                 print(f"[{addr}] Message vide ou incomplet")
@@ -105,14 +105,17 @@ class router:
             # Déchiffrer
             next_ip, next_port, rest = self.decrypt_message(full_message)
 
-            # Forward
+            # Forward au prochain saut en chunks
             if next_ip and next_port:
                 print(f"[TRANSFERT] Vers {next_ip}:{next_port}")
+                chunks = self.chunk_message(rest)
                 forward_socket = socket.socket()
                 forward_socket.connect((next_ip, next_port))
-                forward_socket.send(rest.encode('utf-8'))
+                for chunk in chunks:
+                    forward_socket.send(chunk)
+                    time.sleep(2)
                 forward_socket.close()
-                print("[OK] Message transféré")
+                print("[OK] Message transféré en chunks")
 
         except ValueError as e:
             print(f"[ERREUR FORMAT] {e}")
@@ -121,17 +124,26 @@ class router:
         finally:
             conn.close()
 
+    def chunk_message(self, message: str, max_chunk_size=1024):
+        data = message.encode()
+        msg_id = 0  # tu peux incrémenter si tu veux plusieurs messages simultanés
+        chunks = []
+        total_chunks = (len(data) + max_chunk_size - 1) // max_chunk_size
+
+        for i in range(total_chunks):
+            start = i * max_chunk_size
+            end = start + max_chunk_size
+            chunk_data = data[start:end]
+            header = f"{msg_id}|{i}|{total_chunks}|".encode()
+            chunks.append(header + chunk_data)
+
+        return chunks
 
     def receive_full_message(self, conn):
-        """
-        Reçoit tous les chunks et reconstruit le message complet
-        """
         while True:
             data = conn.recv(2048)
-            print(data)
             if not data:
                 break
-
             try:
                 header, payload = data.split(b"|", 3)[0:3], data.split(b"|", 3)[3]
                 msg_id = int(header[0])
