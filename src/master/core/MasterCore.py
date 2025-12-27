@@ -33,7 +33,7 @@ class MasterCore:
         self.init_db_connection()
 
     def init_db_connection(self):
-        """Vérifie la connexion à la BDD MariaDB sans créer de tables [cite: 46, 71]"""
+        """Vérifie la connexion à la BDD MariaDB sans créer de tables"""
         try:
             conn = pymysql.connect(**self.db_config)
             conn.close()
@@ -44,7 +44,7 @@ class MasterCore:
             print(f"[DATABASE ERROR] Connexion impossible : {e}")
 
     def log_message_to_db(self, sender, receiver, msg):
-        """Ajoute une entrée dans l'historique des logs [cite: 224]"""
+        """Ajoute une entrée dans l'historique des logs"""
         if self.db_connected:
             try:
                 conn = pymysql.connect(**self.db_config)
@@ -61,7 +61,6 @@ class MasterCore:
             try:
                 conn = pymysql.connect(**self.db_config)
                 cursor = conn.cursor()
-                # REPLACE met à jour si le nom existe déjà
                 sql = "REPLACE INTO active_nodes (name, type, ip, port, public_key) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(sql, (name, ntype, ip, port, pubkey))
                 conn.close()
