@@ -25,11 +25,9 @@ class MasterGUI(QMainWindow):
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(15)
 
-        # --- EN-TÊTE AVEC SAISIE DU PORT ---
         header_widget = QWidget()
         header_layout = QHBoxLayout(header_widget)
 
-        # Configuration du port
         header_layout.addWidget(QLabel("Port :"))
         self.port_input = QLineEdit()
         self.port_input.setText("10001")
@@ -56,17 +54,14 @@ class MasterGUI(QMainWindow):
 
         main_layout.addWidget(header_widget)
 
-        # --- BOUTON D'ACTION ---
         self.btn_shutdown = QPushButton("🛑 Arrêt Total")
         self.btn_shutdown.setStyleSheet(
             "padding: 10px; background-color: #dc3545; color: white; font-weight: bold; border-radius: 4px;")
         self.btn_shutdown.clicked.connect(self.on_shutdown_clicked)
         main_layout.addWidget(self.btn_shutdown)
 
-        # --- ONGLETS ---
         self.tabs = QTabWidget()
 
-        # Onglet Nœuds
         tab_nodes = QWidget()
         nodes_layout = QVBoxLayout(tab_nodes)
         nodes_layout.setContentsMargins(15, 15, 15, 15)
@@ -77,7 +72,6 @@ class MasterGUI(QMainWindow):
         nodes_layout.addWidget(self.table_nodes)
         self.tabs.addTab(tab_nodes, "📡 Nœuds")
 
-        # Onglet Clés
         tab_keys = QWidget()
         keys_layout = QVBoxLayout(tab_keys)
         keys_layout.setContentsMargins(15, 15, 15, 15)
@@ -88,7 +82,6 @@ class MasterGUI(QMainWindow):
         keys_layout.addWidget(self.table_keys)
         self.tabs.addTab(tab_keys, "🔑 Clés")
 
-        # Onglet Statistiques (DÉTAILLÉ)
         tab_stats = QWidget()
         stats_layout = QVBoxLayout(tab_stats)
         stats_layout.setContentsMargins(15, 15, 15, 15)
@@ -97,9 +90,8 @@ class MasterGUI(QMainWindow):
         stats_grid = QWidget()
         stats_grid_layout = QHBoxLayout(stats_grid)
 
-        # Bloc Clients
         cl_cont = QVBoxLayout()
-        cl_cont.addWidget(QLabel("<b>Nombre de Clients</b>"))  # Explication remise
+        cl_cont.addWidget(QLabel("<b>Nombre de Clients</b>")) 
         group_clients = QGroupBox("Statut")
         group_clients.setStyleSheet("font-weight: bold; border: 2px solid #dddddd; border-radius: 5px;")
         cl_lay = QVBoxLayout(group_clients)
@@ -110,9 +102,8 @@ class MasterGUI(QMainWindow):
         cl_cont.addWidget(group_clients)
         stats_grid_layout.addLayout(cl_cont)
 
-        # Bloc Routeurs
         ro_cont = QVBoxLayout()
-        ro_cont.addWidget(QLabel("<b>Nombre de Routeurs</b>"))  # Explication remise
+        ro_cont.addWidget(QLabel("<b>Nombre de Routeurs</b>"))  
         group_routers = QGroupBox("Statut")
         group_routers.setStyleSheet("font-weight: bold; border: 2px solid #dddddd; border-radius: 5px;")
         ro_lay = QVBoxLayout(group_routers)
@@ -123,9 +114,8 @@ class MasterGUI(QMainWindow):
         ro_cont.addWidget(group_routers)
         stats_grid_layout.addLayout(ro_cont)
 
-        # Bloc BDD
         db_cont = QVBoxLayout()
-        db_cont.addWidget(QLabel("<b>Base de Données</b>"))  # Explication remise
+        db_cont.addWidget(QLabel("<b>Base de Données</b>"))  
         group_db = QGroupBox("État")
         group_db.setStyleSheet("font-weight: bold; border: 2px solid #dddddd; border-radius: 5px;")
         db_lay = QVBoxLayout(group_db)
@@ -142,7 +132,6 @@ class MasterGUI(QMainWindow):
 
         main_layout.addWidget(self.tabs)
 
-        # Section Logs
         main_layout.addWidget(QLabel("Logs du système"))
         self.log_console = QTextEdit()
         self.log_console.setReadOnly(True)
@@ -155,8 +144,6 @@ class MasterGUI(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.handler.on_update)
         self.timer.start(500)
-
-    # --- MÉTHODES DE MISE À JOUR ---
 
     def refresh_status(self, num_clients, num_routers):
         self.label_routers.setText(f"Routeurs : {num_routers}")
@@ -178,7 +165,6 @@ class MasterGUI(QMainWindow):
             row = self.table_nodes.rowCount()
             self.table_nodes.insertRow(row)
             self.table_nodes.setItem(row, 0, QTableWidgetItem("Client"))
-            # Correction ici : on utilise 'name' au lieu de 'id' pour correspondre au MasterConnection
             self.table_nodes.setItem(row, 1, QTableWidgetItem(str(node.get('name', 'N/A'))))
             self.table_nodes.setItem(row, 2, QTableWidgetItem(str(node.get('ip', 'N/A'))))
             self.table_nodes.setItem(row, 3, QTableWidgetItem(str(node.get('port', 'N/A'))))
