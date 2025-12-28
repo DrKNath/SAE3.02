@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+import random
 
 class NetworkHandler:
     def __init__(self, core):
@@ -9,7 +10,7 @@ class NetworkHandler:
 
         #Partie chunk
         self.MAX_CHUNK_SIZE = 1024  #taille max par chunk 
-        self._msg_counter:int = 0      
+        self._msg_counter:int = random.randint(0, 10000)  
 
     def start_server(self):
         server = socket.socket()
@@ -37,6 +38,8 @@ class NetworkHandler:
     def handle_incoming(self, cli, addr):
         try:
             msg = cli.recv(4096).decode()
+            parties = msg.split(" | ", 3)  
+            msg = parties[3] if len(parties) == 4 else ""
             return self.core.ui_handler.notify_received_message(msg)
         except:
             pass

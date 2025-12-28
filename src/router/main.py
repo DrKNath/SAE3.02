@@ -3,6 +3,7 @@ import threading
 import time
 import sys
 from crypto.crypto import crypto
+import random 
 
 class router:
     def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):
@@ -129,7 +130,7 @@ class router:
 
     def chunk_message(self, message: str, max_chunk_size=1024):
         data = message.encode()
-        msg_id = 0
+        msg_id = random.randint(0,10000)
         chunks = []
         total_chunks = (len(data) + max_chunk_size - 1) // max_chunk_size
 
