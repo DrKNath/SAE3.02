@@ -7,7 +7,7 @@ from crypto.crypto import crypto
 class router:
     def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):
 
-        key_size = sys.argv[1] if len(sys.argv) > 1 else 8
+        key_size = int(sys.argv[1] if len(sys.argv) > 1 else 8)
 
         self.__name = name
         self.__host = host
