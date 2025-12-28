@@ -2,8 +2,8 @@ import socket
 import threading
 import time
 import sys
-import random
 from crypto.crypto import crypto
+import random 
 
 class router:
     def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):
@@ -94,13 +94,16 @@ class router:
 
     def new_connection(self):
         while True:
-            conn, address = self.__router_socket.accept()
-            print(f"[CONNEXION] Nouvelle connexion depuis {address}")
-            self.__list_connected.append(conn)
-            
-            thread_client = threading.Thread(target=self.routage, args=(conn, address))
-            thread_client.daemon = True
-            thread_client.start()
+            try: 
+                conn, address = self.__router_socket.accept()
+                print(f"[CONNEXION] Nouvelle connexion depuis {address}")
+                self.__list_connected.append(conn)
+                
+                thread_client = threading.Thread(target=self.routage, args=(conn, address))
+                thread_client.daemon = True
+                thread_client.start()
+            except:
+                break
 
     def routage(self, conn, addr):
         try:
@@ -121,6 +124,7 @@ class router:
                 forward_socket.connect((next_ip, next_port))
                 for chunk in chunks:
                     forward_socket.send(chunk)
+                    #print(chunk)
                     time.sleep(2)
                 forward_socket.close()
                 print("[OK] Message transféré en chunks")
@@ -152,6 +156,7 @@ class router:
             data = conn.recv(2048)
             if not data:
                 break
+            #print(data)
             try:
                 header, payload = data.split(b"|", 3)[0:3], data.split(b"|", 3)[3]
                 msg_id = int(header[0])
@@ -184,7 +189,6 @@ class router:
         try:
             # Déchiffrer directement
             decrypted = self.__crypto.decrypt(encrypted_message)
-            print(f"[DECRYPT] Succès ! Déchiffré: {decrypted[:100]}...")
             
             # Parser le résultat déchiffré
             parts = decrypted.split('::', 2)
@@ -225,8 +229,11 @@ class router:
                 print(f"[INFO] IP master définie à {ip}")
 
             case ["/port", "master", port]:
-                self.__master_port = int(port)
-                print(f"[INFO] Port master défini à {port}")
+                try: 
+                    self.__master_port = int(port)
+                    print(f"[INFO] Port master défini à {port}")
+                except: 
+                    print("Le port doit être un entier")
 
             case ["/status"]:
                 print("---- ROUTER STATUS ----")
@@ -240,13 +247,12 @@ class router:
                 threading.Thread(target=self.connection_master, daemon=True).start()
 
             case ["/help"]:
-                print("""
-                    Commandes disponibles:
-                    /ip master <ip>       → définir IP du master
-                    /port master <port>   → définir port du master
-                    /start master         → forcer connexion master
-                    /status               → état du router
-                    /stop                 → arrêter le router
+                print("""Commandes disponibles:
+/ip master <ip>       → définir IP du master
+/port master <port>   → définir port du master
+/start master         → forcer connexion master
+/status               → état du router
+/stop                 → arrêter le router
                     """)
 
             case ["/stop"]:
@@ -255,13 +261,12 @@ class router:
                 sys.exit(0)
 
             case _:
-                print("""
-                    Commandes disponibles:
-                    /ip master <ip>       → définir IP du master
-                    /port master <port>   → définir port du master
-                    /start master         → forcer connexion master
-                    /status               → état du router
-                    /stop                 → arrêter le router
+                print("""Commandes disponibles:
+/ip master <ip>       → définir IP du master
+/port master <port>   → définir port du master
+/start master         → forcer connexion master
+/status               → état du router
+/stop                 → arrêter le router
                     """)
         
             
