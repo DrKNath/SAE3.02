@@ -39,6 +39,12 @@ class router:
             print("Unable to get Hostname and IP")
 
     def start(self):
+        try:
+            self.__router_socket.bind((self.__host, self.__port))
+            self.__router_socket.listen(5)
+        except:
+            print("Port déjà utilisé")
+            sys.exit(0)
         #Thread Terminal
         thread_terminal = threading.Thread(target=self.terminal_loop)
         thread_terminal.daemon = True
@@ -49,8 +55,6 @@ class router:
         thread_master.daemon = True
         thread_master.start()
 
-        self.__router_socket.bind((self.__host, self.__port))
-        self.__router_socket.listen(5)
         print(f"[ROUTER {self.__name}] Écoute sur {self.__host}:{self.__port}")
         print(f"[ROUTER {self.__name}] Clé publique: {self.__public_key}")
         print(f"[ROUTER {self.__name}] Clé privée: {self.__prv_key}")
