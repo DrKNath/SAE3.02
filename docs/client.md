@@ -26,3 +26,6 @@ puit d'appuyer sur envoyer.
 
 ## Info 
 Si vous augmenté le nombre de saut, le message sera beaucoup plus long à envoyer et à recevoir.
+
+# ⚠️ Attention
+Si vous avez l'impression que votre client ne repond plus, juste après avoir envoyer le message, c'est normal c'est parce qu'il est entrain d'envoyer le message. Attendais jusqu'a que votre message s'affiche dans la partie ```Messages Reçus```
