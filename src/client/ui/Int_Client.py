@@ -11,6 +11,7 @@ class ClientGUI(QMainWindow):
 
         self.setWindowTitle("Client - Messagerie Oignon")
         self.resize(1100, 750)
+        # Style identique au Master
         self.setStyleSheet("""
             QMainWindow { background-color: #f5f5f5; }
             QLabel { color: #333333; }
@@ -36,7 +37,7 @@ class ClientGUI(QMainWindow):
         main_layout.setSpacing(15)
         top_layout = QHBoxLayout()
 
-
+        # --- GAUCHE : MON IDENTITÉ & CONNEXION ---
         left_panel = QVBoxLayout()
         id_box = QGroupBox("Mon Identité (Machine)")
         id_lay = QVBoxLayout()
@@ -65,7 +66,7 @@ class ClientGUI(QMainWindow):
         left_panel.addWidget(mst_box)
         top_layout.addLayout(left_panel, 1)
 
-
+        # --- CENTRE : MESSAGES ---
         mid_panel = QVBoxLayout()
         mid_panel.addWidget(QLabel("Messages Reçus :"))
         self.receive_area = QTextEdit()
@@ -91,7 +92,7 @@ class ClientGUI(QMainWindow):
         mid_panel.addWidget(send_box, 2)
         top_layout.addLayout(mid_panel, 2)
 
-
+        # --- DROITE : LISTES ---
         right_panel = QVBoxLayout()
         self.list_c = QListWidget()
         self.list_r = QListWidget()
@@ -102,7 +103,8 @@ class ClientGUI(QMainWindow):
         top_layout.addLayout(right_panel, 1)
 
         main_layout.addLayout(top_layout, 4)
-      
+
+        # --- BAS : LOGS ---
         main_layout.addWidget(QLabel("Logs du Client :"))
         self.log_console = QTextEdit()
         self.log_console.setReadOnly(True)
@@ -121,15 +123,18 @@ class ClientGUI(QMainWindow):
 
     def refresh_ui(self):
         """Met à jour les listes sans perdre la sélection"""
+        # On mémorise quel client était sélectionné (par son texte)
         selected_items = self.list_c.selectedItems()
         selected_text = selected_items[0].text() if selected_items else None
 
         self.list_c.clear()
         list_clients = self.handler.get_list_clients()
         for c in list_clients:
+            # Correction : MasterConnection utilise 'name'
             client_display = f"{c['name']} @ {c['ip']}:{c['port']}"
             if c['name'] != self.handler.core.name:
                 item = self.list_c.addItem(client_display)
+                # On remet la sélection si c'était celui-là
                 if client_display == selected_text:
                     self.list_c.setCurrentRow(self.list_c.count() - 1)
 

@@ -27,7 +27,7 @@ class ClientHandler:
                     "name": name, "ip": ip, "port": int(port), "public_key": pubkey
                 })
 
-                #Log historique et ajout à la table des nœuds actifs AVEC clé publique
+                # [cite_start]Log historique et ajout à la table des nœuds actifs AVEC clé publique [cite: 126]
                 self.core.log_message_to_db("SYSTEM", name, f"Connexion Routeur: {ip}:{port}")
                 self.core.db_manage_active_node(name, "ROUTER", ip, port, pubkey)
 
@@ -71,12 +71,6 @@ class ClientHandler:
                 client.send(msg)
             except:
                 self.disconnect(client)
-
-        for router in self.socket_routers[:]:
-            try:
-                router.send(b"") 
-            except:
-                self.disconnect(router)
 
     def stop(self):
         for s in self.socket_clients + self.socket_routers:
