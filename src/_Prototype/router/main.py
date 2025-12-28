@@ -129,7 +129,7 @@ class router:
 
     def chunk_message(self, message: str, max_chunk_size=1024):
         data = message.encode()
-        msg_id = 0  # tu peux incrémenter si tu veux plusieurs messages simultanés
+        msg_id = 0 
         chunks = []
         total_chunks = (len(data) + max_chunk_size - 1) // max_chunk_size
 
@@ -163,8 +163,7 @@ class router:
                 }
 
             self.__chunk_buffer[msg_id]["chunks"][chunk_index] = payload
-
-            # Si tous les chunks sont reçus
+            
             if len(self.__chunk_buffer[msg_id]["chunks"]) == total_chunks:
                 chunks = self.__chunk_buffer[msg_id]["chunks"]
                 full_data = b"".join(chunks[i] for i in range(total_chunks))

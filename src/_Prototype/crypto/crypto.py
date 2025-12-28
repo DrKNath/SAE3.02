@@ -8,12 +8,10 @@ class crypto:
     
     @property
     def public(self):
-        """Exposer uniquement la clé publique en lecture seule"""
         return self.public_key
     
     @property
     def prive(self):
-        """Exposer uniquement la clé privée en lecture seule"""
         return self.private_key
     
     def gen_prime(self, bits: int = None):
@@ -45,11 +43,9 @@ class crypto:
             pub_key = self.public_key
         e, n = pub_key
         encrypted = [pow(ord(c), e, n) for c in message]
-        # Convertir la liste en string avec des virgules
         return ','.join(map(str, encrypted))
     
     def decrypt(self, cipher_str: str):
-        # Convertir la string en liste de nombres
         cipher = [int(x) for x in cipher_str.split(',')]
         d, n = self.private_key
         decrypted = ''.join(chr(pow(v, d, n)) for v in cipher)

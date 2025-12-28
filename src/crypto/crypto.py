@@ -8,12 +8,10 @@ class crypto:
     
     @property
     def public(self):
-        """Exposer uniquement la clé publique en lecture seule"""
         return self.public_key
     
     @property
     def prive(self):
-        """Exposer uniquement la clé privée en lecture seule"""
         return self.private_key
     
     def gen_prime(self, bits: int = None):
