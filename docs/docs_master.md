@@ -6,4 +6,4 @@ Le master gère la base de donné qui est alimenté par les personne qui sont co
 ## RUN
 après avoir installé toute les modules en plus et fait "python -m master.main" vous arriverez sur cette interface: 
 
-![Texte alternatif](docs/img/masterBeforeRUN.png)
+![Texte alternatif](img/masterBeforeRUN.png)
