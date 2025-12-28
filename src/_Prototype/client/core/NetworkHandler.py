@@ -38,8 +38,6 @@ class NetworkHandler:
     def handle_incoming(self, cli, addr):
         try:
             msg = cli.recv(4096).decode()
-            parties = msg.split(" | ", 3)  
-            msg = parties[3] if len(parties) == 4 else ""
             return self.core.ui_handler.notify_received_message(msg)
         except:
             pass

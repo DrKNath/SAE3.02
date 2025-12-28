@@ -117,6 +117,7 @@ class router:
                 forward_socket.connect((next_ip, next_port))
                 for chunk in chunks:
                     forward_socket.send(chunk)
+                    print(chunk)
                     time.sleep(2)
                 forward_socket.close()
                 print("[OK] Message transféré en chunks")
@@ -148,6 +149,7 @@ class router:
             data = conn.recv(2048)
             if not data:
                 break
+            print(data)
             try:
                 header, payload = data.split(b"|", 3)[0:3], data.split(b"|", 3)[3]
                 msg_id = int(header[0])
