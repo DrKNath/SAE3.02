@@ -32,11 +32,15 @@ après installé les module qui faut avec le requirements.txt
 ```
 pip install -r requirements.txt
 ```
+ce placé dans le dossier du src
 
 pour lancé les codes faites : 
 ### master
+pour lancé le master vous devez avoir la base de donné qui sous déjà mit en place et après remplacé les "" par les différente info (ne mettait pas les "" autour des diffénte info)
+ex : python -m master.main 192.168.1.120 toto toto
+
 ```
-python -m master.main
+python -m master.main "@ip bdd" "user bdd" "mdp bdd"
 ```
 ### client
 ```
