@@ -1,10 +1,14 @@
 import socket
 import threading
 import time
+import sys
 from crypto.crypto import crypto
 
 class router:
     def __init__(self, name: str, host: str = '0.0.0.0', port: int = 0):
+
+        key_size = sys.argv[1] if len(sys.argv) > 1 else 8
+
         self.__name = name
         self.__host = host
         self.__port = port
@@ -12,7 +16,7 @@ class router:
         self.__master_host:str = None
         self.__master_port:int = None
 
-        self.__crypto = crypto()
+        self.__crypto = crypto(key_size)
         self.__public_key = self.__crypto.public
         self.__prv_key = self.__crypto.prive
 
@@ -20,6 +24,7 @@ class router:
         self.__list_connected = []
 
         self.__chunk_buffer = {}
+        
 
     
     def get_Host_IP(self):
@@ -59,7 +64,6 @@ class router:
     def connection_master(self):
         while True:
             if not self.__master_host or not self.__master_port:
-                import time
                 time.sleep(1)
                 continue
 
@@ -80,7 +84,6 @@ class router:
             finally:
                 if co_master:
                     co_master.close()
-                import time
                 time.sleep(5)  # on attend avant de retenter
 
 
@@ -245,7 +248,6 @@ class router:
             case ["/stop"]:
                 print("[STOP] Fermeture du router.")
                 self.__router_socket.close()
-                import sys
                 sys.exit(0)
 
             case _:

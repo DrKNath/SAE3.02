@@ -31,7 +31,6 @@ class ClientCore:
         self.master_conn.stop()
         self.network_handler.stop()
 
-        import sys
         print("[INFO] Client déconnecté et arrêté.")
         # sys.exit(0) tue tous les threads daemons instantanément
         sys.exit(0)
