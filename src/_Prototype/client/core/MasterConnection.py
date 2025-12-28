@@ -28,7 +28,6 @@ class MasterConnection:
             print("Unable to get Hostname and IP")
 
     def connect_master(self):
-        # On vérifie le flag global avant chaque tour
         while self.running and self.core.running:
             try:
                 self.sock = socket.socket()
@@ -43,15 +42,13 @@ class MasterConnection:
                     if not data:
                         raise ConnectionError("Connexion perdue")
 
-                    # --- DÉCONNEXION VOLONTAIRE (Signal SHUTDOWN) ---
                     if data and data.decode() == "SHUTDOWN":
                         self.running = False
                         self.core.stop()  #
                         return
 
-                        # --- PERTE DE CONNEXION ---
                     if not data or data.decode() == "STOP":
-                        break  # Va au finally pour retenter
+                        break
 
 
                     if data:
@@ -62,12 +59,9 @@ class MasterConnection:
 
 
             except:
-                # LA DIFFÉRENCE EST ICI :
-                # On affiche le Warn UNIQUEMENT si le Core est toujours en "running"
                 if self.core.running and self.running:
                     print("[WARN] Master indisponible (Tentative...)")
                 else:
-                    # Si le core s'arrête, on sort du thread en silence
                     return
             finally:
                 if self.sock:
@@ -76,8 +70,7 @@ class MasterConnection:
                     except:
                         pass
                     self.sock = None
-
-                # SÉCURITÉ : Si le core s'arrête, on ne fait pas le time.sleep(3)
+                    
                 if not self.core.running or not self.running:
                     return
 
