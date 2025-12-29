@@ -11,7 +11,7 @@ Déchiffre et envoie au prochain saut
 Chiffre et envoi au premier au router 
 
 ## RUN
-Premièrement vous devez crée la base de donné, tout est dans la [docs bdd.md](docs/bdd.md)
+Premièrement vous devez créer la base de donnée, tout est dans la [docs bdd.md](docs/bdd.md)
 
 Pour lancé les différent code, vous trouverez un requirement.txt qu'on vous invite à installé dans un environement virtuelle. 
 Les étapes à suivre : 
