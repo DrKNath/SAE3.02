@@ -1,5 +1,5 @@
 # BDD
-Cette partie à était réaliser sur machine sous Linux.
+Cette partie à été réaliser sur une machine sous Linux.
 
 ## Setup
 Dans votre logiciel de basse de donné vous allez devoir crée un basse de donné nommé ```oignon_db```.
