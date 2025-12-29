@@ -1,4 +1,4 @@
-# SAE3.02
+# SAE3.02 grp : LABUBU
 Développer des applications communicantes
 
 ## Master : 
