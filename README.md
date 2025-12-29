@@ -5,7 +5,7 @@ Développer des applications communicantes
 Le master sert juste de "base de donné"
 
 ## Router :
-Décrypt et envoie au prochain saut
+Déchiffre et envoie au prochain saut
 
 ## Client :
 Chiffre et envoi au premier au router 
