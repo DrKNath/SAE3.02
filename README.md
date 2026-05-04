@@ -1,7 +1,7 @@
 # SAE3.02 grp : LABUBU
 Développer des applications communicantes
 
-Ce projet, réalisé en BUT Réseaux & Télécoms, consiste à développer une architecture distribuée complète permettant à des clients d'échanger des messages de manière sécurisée et anonyme à travers une chaîne de routeurs virtuels.
+Ce projet, réalisé en BUT Réseaux & Télécoms, consiste à développer une architecture distribuée complète permettant à des clients d'échanger des messages de manière sécurisée et anonyme à travers une chaîne de "routeurs" virtuels.
 
 **Points clés :**
 
