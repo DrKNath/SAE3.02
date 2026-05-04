@@ -1,6 +1,20 @@
 # SAE3.02 grp : LABUBU
 Développer des applications communicantes
 
+Ce projet, réalisé en BUT Réseaux & Télécoms, consiste à développer une architecture distribuée complète permettant à des clients d'échanger des messages de manière sécurisée et anonyme à travers une chaîne de routeurs virtuels.
+
+Points clés :
+
+Routage multi-sauts : Communication via sockets Python (TCP/UDP) et gestion multi-thread.
+
+Sécurité & Anonymat : Implémentation d'un chiffrement asymétrique par couches successives. Chaque nœud ne connaît que son voisin direct.
+
+Architecture Master/Client/Router : Un serveur Master supervise la topologie et distribue les clés publiques stockées en base MariaDB.
+
+Interfaces Graphiques : Visualisation du réseau et interface de messagerie développées avec PyQt.
+
+Stack technique : Python, Sockets, Threading, MariaDB, PyQt6.
+
 ## Master : 
 Le master sert juste de "base de donné"
 
