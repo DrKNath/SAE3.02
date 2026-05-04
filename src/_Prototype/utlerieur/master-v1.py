@@ -27,7 +27,7 @@ class master:
             console_command = str(input("Console Serveur >> "))
             if console_command == '/stop':
                 try:
-                    self.broadcast("Le serveur va s'arrêter.".encode('utf-8'))
+                    self.broadcast(None, None, "Le serveur va s'arrêter.")
                 except:
                     pass
                 finally:
