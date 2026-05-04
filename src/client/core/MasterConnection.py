@@ -70,8 +70,8 @@ class MasterConnection:
                         pass
                     self.sock = None
 
-                if not self.core.running or not self.running:
-                    return
+            if not self.core.running or not self.running:
+                return
 
                 time.sleep(3)
     def parse_lists(self, msg):
